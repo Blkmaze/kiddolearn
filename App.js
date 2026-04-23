@@ -1,20 +1,634 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
+import { WebView } from 'react-native-webview';
+
+const htmlContent = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>ParlayPro — Super Squares</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=IBM+Plex+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg0:#0a0a0f;--bg1:#12121a;--bg2:#1a1a26;--bg3:#22223a;
+  --accent:#6c63ff;--accent2:#ff6584;--yellow:#f5c518;--green:#22c55e;--red:#ef4444;
+  --text1:#f0f0ff;--text2:#a8a8c8;--text3:#6060a0;
+  --cell-open:#1e1e2e;--cell-sold:#2d1f3d;--cell-mine:#1a3a2a;
+  --border:#2a2a40;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg0);color:var(--text1);font-family:'Inter',sans-serif;min-height:100vh;display:flex;flex-direction:column;}
+/* HEADER */
+.header{background:var(--bg1);border-bottom:1px solid var(--border);padding:12px 16px;display:flex;align-items:center;gap:12px;}
+.logo{font-size:18px;font-weight:900;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.header-sub{font-size:11px;color:var(--text3);font-family:'IBM Plex Mono',monospace;}
+/* TICKER */
+.ticker-wrap{background:var(--bg1);border-bottom:1px solid var(--border);overflow:hidden;height:32px;display:flex;align-items:center;}
+.ticker-inner{display:flex;gap:32px;animation:ticker 40s linear infinite;white-space:nowrap;padding:0 16px;}
+@keyframes ticker{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+.tick-item{font-size:11px;font-family:'IBM Plex Mono',monospace;color:var(--text2);}
+.tick-item span{color:var(--yellow);margin-left:6px;}
+/* LAYOUT */
+.app{display:flex;flex:1;gap:0;overflow:hidden;}
+/* GAME LIST */
+.game-list{width:200px;min-width:200px;background:var(--bg1);border-right:1px solid var(--border);overflow-y:auto;padding:8px;}
+.sport-label{font-size:10px;font-weight:700;color:var(--text3);padding:8px 6px 4px;letter-spacing:.08em;text-transform:uppercase;}
+.game-btn{width:100%;background:transparent;border:1px solid transparent;border-radius:8px;padding:8px 10px;cursor:pointer;text-align:left;color:var(--text1);margin-bottom:2px;transition:all .15s;}
+.game-btn:hover{background:var(--bg2);border-color:var(--border);}
+.game-btn.active{background:var(--bg3);border-color:var(--accent);}
+.game-btn-teams{font-size:12px;font-weight:600;}
+.game-btn-time{font-size:10px;color:var(--text3);margin-top:2px;font-family:'IBM Plex Mono',monospace;}
+.game-btn.active .game-btn-time{color:var(--accent);}
+/* MAIN */
+.main{flex:1;overflow-y:auto;padding:12px;}
+.board-wrap{background:var(--bg1);border-radius:12px;border:1px solid var(--border);overflow:hidden;margin-bottom:12px;}
+.board-header{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;}
+.board-title{font-size:14px;font-weight:700;}
+.board-meta{font-size:11px;color:var(--text3);font-family:'IBM Plex Mono',monospace;}
+.avail-badge{background:var(--bg3);border:1px solid var(--border);border-radius:20px;padding:3px 10px;font-size:11px;font-weight:600;font-family:'IBM Plex Mono',monospace;}
+.avail-badge span{color:var(--green);}
+/* GRID */
+.grid-wrap{padding:8px;overflow-x:auto;}
+.squares-grid{display:grid;grid-template-columns:36px repeat(10,1fr);gap:2px;min-width:340px;}
+.axis-corner{background:transparent;}
+.axis-top,.axis-left{background:var(--bg3);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--text2);font-family:'IBM Plex Mono',monospace;height:28px;}
+.axis-left{height:auto;min-height:32px;}
+.team-banner{grid-column:2/12;background:var(--bg3);border-radius:6px;padding:4px 8px;font-size:11px;font-weight:700;color:var(--text2);text-align:center;margin-bottom:2px;}
+.cell{border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;min-height:32px;cursor:pointer;transition:all .12s;font-family:'IBM Plex Mono',monospace;border:1px solid transparent;}
+.cell-open{background:var(--cell-open);border-color:var(--border);}
+.cell-open:hover{background:var(--bg3);border-color:var(--accent);transform:scale(1.05);}
+.cell-sold{background:var(--cell-sold);color:var(--accent2);cursor:default;border-color:#3d1f3d;}
+.cell-mine{background:var(--cell-mine);color:var(--green);cursor:default;border-color:#1a4a2a;}
+/* SIDEBAR */
+.sidebar{width:260px;min-width:260px;background:var(--bg1);border-left:1px solid var(--border);overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:12px;}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px;}
+.card-title{font-size:11px;font-weight:700;color:var(--text3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px;}
+/* CLAIM */
+.initials-row{display:flex;gap:6px;margin-bottom:10px;}
+.initials-input{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:8px 10px;color:var(--text1);font-size:13px;font-weight:600;font-family:'IBM Plex Mono',monospace;outline:none;}
+.initials-input:focus{border-color:var(--accent);}
+.qty-row{display:flex;gap:4px;margin-bottom:10px;flex-wrap:wrap;}
+.qty-btn{flex:1;min-width:28px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:5px 4px;color:var(--text2);font-size:12px;font-weight:600;cursor:pointer;transition:all .12s;text-align:center;}
+.qty-btn.active,.qty-btn:hover{background:var(--accent);border-color:var(--accent);color:#fff;}
+.buy-btn{width:100%;background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;border-radius:8px;padding:10px;color:#fff;font-size:13px;font-weight:800;cursor:pointer;letter-spacing:.02em;}
+.buy-btn:hover{opacity:.9;}
+.buy-btn:disabled{opacity:.5;cursor:not-allowed;}
+/* ODDS */
+.odds-row{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px;}
+.odds-btn{background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:8px;cursor:pointer;transition:all .12s;}
+.odds-btn:hover,.odds-btn.active{border-color:var(--accent);background:var(--bg3);}
+.odds-label{font-size:10px;color:var(--text3);margin-bottom:2px;}
+.odds-val{font-size:13px;font-weight:700;font-family:'IBM Plex Mono',monospace;color:var(--text1);}
+.odds-val.pos{color:var(--green);}
+.odds-val.neg{color:var(--red);}
+/* ADMIN */
+.admin-section{border-top:1px solid var(--border);padding-top:12px;margin-top:4px;}
+.admin-label{font-size:10px;color:var(--text3);font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px;}
+.admin-btn{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:8px 10px;color:var(--text2);font-size:12px;font-weight:600;cursor:pointer;text-align:left;margin-bottom:6px;transition:all .12s;}
+.admin-btn:hover{border-color:var(--accent);color:var(--text1);}
+.admin-btn-red{border-color:#3a1a1a;color:var(--red);}
+.admin-btn-red:hover{background:rgba(239,68,68,.1);border-color:var(--red);}
+.admin-btn-green{border-color:#1a3a1a;color:var(--green);}
+.admin-btn-green:hover{background:rgba(34,197,94,.1);border-color:var(--green);}
+/* STATUS */
+.status-dot{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-family:'IBM Plex Mono',monospace;padding:2px 8px;border-radius:10px;}
+.status-live{background:rgba(239,68,68,.15);color:var(--red);border:1px solid rgba(239,68,68,.3);}
+.status-sched{background:rgba(108,99,255,.15);color:var(--accent);border:1px solid rgba(108,99,255,.3);}
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:100;align-items:center;justify-content:center;}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--bg1);border:1px solid var(--border);border-radius:14px;padding:24px;max-width:340px;width:90%;text-align:center;}
+.modal h3{font-size:16px;font-weight:800;margin-bottom:8px;}
+.modal p{font-size:13px;color:var(--text2);margin-bottom:16px;}
+.modal-btns{display:flex;gap:8px;justify-content:center;}
+.modal-btn{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:8px 20px;color:var(--text1);font-size:13px;font-weight:600;cursor:pointer;}
+.modal-btn-primary{background:var(--accent);border-color:var(--accent);}
+/* TOAST */
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--bg2);border:1px solid var(--green);border-radius:8px;padding:10px 20px;font-size:13px;font-weight:600;color:var(--green);z-index:200;opacity:0;transition:opacity .3s;pointer-events:none;}
+.toast.show{opacity:1;}
+/* EMPTY STATE */
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;height:300px;color:var(--text3);gap:8px;}
+.empty-state .big{font-size:32px;}
+.empty-state p{font-size:13px;}
+/* SCROLLBAR */
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+@media(max-width:700px){
+  .game-list{width:130px;min-width:130px;}
+  .sidebar{width:200px;min-width:200px;}
+  .game-btn-teams{font-size:11px;}
+}
+@media(max-width:520px){
+  .app{flex-direction:column;}
+  .game-list{width:100%;min-width:0;border-right:none;border-bottom:1px solid var(--border);max-height:120px;display:flex;flex-direction:row;flex-wrap:wrap;padding:6px;}
+  .sport-label{display:none;}
+  .game-btn{width:auto;padding:5px 8px;}
+  .sidebar{width:100%;min-width:0;border-left:none;border-top:1px solid var(--border);}
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">ParlayPro</div>
+  <div class="header-sub">Super Squares · March 9, 2026</div>
+</div>
+
+<div class="ticker-wrap">
+  <div class="ticker-inner" id="ticker">
+    <span class="tick-item">76ers @ Cavaliers<span>7:00 PM ET</span></span>
+    <span class="tick-item">Nuggets @ Thunder<span>7:30 PM ET</span></span>
+    <span class="tick-item">Grizzlies @ Nets<span>7:30 PM ET</span></span>
+    <span class="tick-item">Warriors @ Jazz<span>9:00 PM ET</span></span>
+    <span class="tick-item">Knicks @ Clippers<span>9:30 PM ET</span></span>
+    <span class="tick-item">Kings @ Blue Jackets<span>3:00 PM ET</span></span>
+    <span class="tick-item">Flames @ Capitals<span>6:00 PM ET</span></span>
+    <span class="tick-item">Rangers @ Flyers<span>6:00 PM ET</span></span>
+    <span class="tick-item">Mammoth @ Blackhawks<span>7:30 PM ET</span></span>
+    <span class="tick-item">Senators @ Canucks<span>9:00 PM ET</span></span>
+    <span class="tick-item">76ers @ Cavaliers<span>7:00 PM ET</span></span>
+    <span class="tick-item">Nuggets @ Thunder<span>7:30 PM ET</span></span>
+    <span class="tick-item">Grizzlies @ Nets<span>7:30 PM ET</span></span>
+    <span class="tick-item">Warriors @ Jazz<span>9:00 PM ET</span></span>
+    <span class="tick-item">Knicks @ Clippers<span>9:30 PM ET</span></span>
+  </div>
+</div>
+
+<div class="app">
+  <!-- GAME LIST -->
+  <div class="game-list">
+    <div class="sport-label">🏀 NBA</div>
+    <button class="game-btn" onclick="selectGame('phi-cle')">
+      <div class="game-btn-teams">76ers @ Cavs</div>
+      <div class="game-btn-time">7:00 PM ET</div>
+    </button>
+    <button class="game-btn" onclick="selectGame('den-okc')">
+      <div class="game-btn-teams">Nuggets @ Thunder</div>
+      <div class="game-btn-time">7:30 PM ET</div>
+    </button>
+    <button class="game-btn" onclick="selectGame('mem-bkn')">
+      <div class="game-btn-teams">Grizzlies @ Nets</div>
+      <div class="game-btn-time">7:30 PM ET</div>
+    </button>
+    <button class="game-btn" onclick="selectGame('gsw-uta')">
+      <div class="game-btn-teams">Warriors @ Jazz</div>
+      <div class="game-btn-time">9:00 PM ET</div>
+    </button>
+    <button class="game-btn" onclick="selectGame('nyk-lac')">
+      <div class="game-btn-teams">Knicks @ Clippers</div>
+      <div class="game-btn-time">9:30 PM ET</div>
+    </button>
+    <div class="sport-label">🏒 NHL</div>
+    <button class="game-btn" onclick="selectGame('lak-cbj')">
+      <div class="game-btn-teams">Kings @ Blue Jackets</div>
+      <div class="game-btn-time">3:00 PM ET</div>
+    </button>
+    <button class="game-btn" onclick="selectGame('cgy-wsh')">
+      <div class="game-btn-teams">Flames @ Capitals</div>
+      <div class="game-btn-time">6:00 PM ET</div>
+    </button>
+    <button class="game-btn" onclick="selectGame('nyr-phi')">
+      <div class="game-btn-teams">Rangers @ Flyers</div>
+      <div class="game-btn-time">6:00 PM ET</div>
+    </button>
+    <button class="game-btn" onclick="selectGame('col-chi')">
+      <div class="game-btn-teams">Mammoth @ Blackhawks</div>
+      <div class="game-btn-time">7:30 PM ET</div>
+    </button>
+    <button class="game-btn" onclick="selectGame('ott-van')">
+      <div class="game-btn-teams">Senators @ Canucks</div>
+      <div class="game-btn-time">9:00 PM ET</div>
+    </button>
+  </div>
+
+  <!-- MAIN BOARD -->
+  <div class="main">
+    <div id="boardWrap" class="board-wrap">
+      <div class="empty-state">
+        <div class="big">🏈</div>
+        <p>Select a game to view the board</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="card">
+      <div class="card-title">Claim Squares</div>
+      <div class="initials-row">
+        <input class="initials-input" id="initialsInput" maxlength="3" placeholder="ABC" oninput="this.value=this.value.toUpperCase()">
+      </div>
+      <div class="qty-row">
+        <button class="qty-btn active" onclick="setQty(1,this)">1</button>
+        <button class="qty-btn" onclick="setQty(2,this)">2</button>
+        <button class="qty-btn" onclick="setQty(5,this)">5</button>
+        <button class="qty-btn" onclick="setQty(10,this)">10</button>
+      </div>
+      <button class="buy-btn" onclick="claimSquares()" id="buyBtn">BUY SQUARES</button>
+    </div>
+
+    <div class="card" id="oddsCard" style="display:none;">
+      <div class="card-title">Odds</div>
+      <div id="oddsContent"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Admin</div>
+      <div class="admin-section">
+        <button class="admin-btn admin-btn-green" onclick="lockNumbers()">🔒 Lock Numbers to Board</button>
+        <button class="admin-btn" onclick="forceRefresh()">↻ Force Refresh Board</button>
+        <button class="admin-btn admin-btn-red" onclick="resetBoard()">⚠ Reset Board (Clear All)</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CONFIRM MODAL -->
+<div class="modal-overlay" id="confirmModal">
+  <div class="modal">
+    <h3 id="modalTitle">Confirm Purchase</h3>
+    <p id="modalBody">Are you sure?</p>
+    <div class="modal-btns">
+      <button class="modal-btn" onclick="closeModal()">Cancel</button>
+      <button class="modal-btn modal-btn-primary" onclick="confirmClaim()">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── CONFIG ───────────────────────────────────────────────────────────────────
+const SUPABASE_URL = 'https://pmbzffdgbtyxbnrtjehq.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBtYnpmZmRnYnR5eGJucnRqZWhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMwOTMwOTUsImV4cCI6MjA4ODY2OTA5NX0.RfX46ZB5f0vhxo2_P7tGuM_-yyf6yM80gp6YYUJ0S9U';
+const ADMIN_PIN = '2826';
+
+// ── GAME DATA ────────────────────────────────────────────────────────────────
+const GAMES = {
+  'phi-cle': { away:'76ers', home:'Cavaliers', time:'7:00 PM ET', sport:'NBA' },
+  'den-okc': { away:'Nuggets', home:'Thunder', time:'7:30 PM ET', sport:'NBA' },
+  'mem-bkn': { away:'Grizzlies', home:'Nets', time:'7:30 PM ET', sport:'NBA' },
+  'gsw-uta': { away:'Warriors', home:'Jazz', time:'9:00 PM ET', sport:'NBA' },
+  'nyk-lac': { away:'Knicks', home:'Clippers', time:'9:30 PM ET', sport:'NBA' },
+  'lak-cbj': { away:'Kings', home:'Blue Jackets', time:'3:00 PM ET', sport:'NHL' },
+  'cgy-wsh': { away:'Flames', home:'Capitals', time:'6:00 PM ET', sport:'NHL' },
+  'nyr-phi': { away:'Rangers', home:'Flyers', time:'6:00 PM ET', sport:'NHL' },
+  'col-chi': { away:'Mammoth', home:'Blackhawks', time:'7:30 PM ET', sport:'NHL' },
+  'ott-van': { away:'Senators', home:'Canucks', time:'9:00 PM ET', sport:'NHL' }
+};
+
+// ── STATE ────────────────────────────────────────────────────────────────────
+let currentGameId = null;
+let currentData = null;
+let claimQty = 1;
+let pendingIndices = [];
+let pollTimer = null;
+
+// ── SUPABASE HELPERS ─────────────────────────────────────────────────────────
+async function sbGet(gameId) {
+  const res = await fetch(\`\${SUPABASE_URL}/rest/v1/squares?game_id=eq.\${gameId}&select=*\`, {
+    headers: { 'apikey': SUPABASE_KEY, 'Authorization': \`Bearer \${SUPABASE_KEY}\` }
+  });
+  const rows = await res.json();
+  return rows && rows.length > 0 ? rows[0] : null;
+}
+
+async function sbUpsert(row) {
+  const res = await fetch(\`\${SUPABASE_URL}/rest/v1/squares?on_conflict=game_id\`, {
+    method: 'POST',
+    headers: {
+      'apikey': SUPABASE_KEY,
+      'Authorization': \`Bearer \${SUPABASE_KEY}\`,
+      'Content-Type': 'application/json',
+      'Prefer': 'resolution=merge-duplicates'
+    },
+    body: JSON.stringify(row)
+  });
+  return res.ok;
+}
+
+// ── SHUFFLE ──────────────────────────────────────────────────────────────────
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+// ── SELECT GAME ──────────────────────────────────────────────────────────────
+async function selectGame(gameId) {
+  currentGameId = gameId;
+
+  // Update active button
+  document.querySelectorAll('.game-btn').forEach(b => b.classList.remove('active'));
+  event && event.currentTarget && event.currentTarget.classList.add('active');
+  // fallback - find by onclick
+  document.querySelectorAll('.game-btn').forEach(b => {
+    if (b.getAttribute('onclick') === \`selectGame('\${gameId}')\`) b.classList.add('active');
+  });
+
+  // Stop old poll
+  if (pollTimer) clearInterval(pollTimer);
+
+  // Show loading
+  document.getElementById('boardWrap').innerHTML = '<div class="empty-state"><div class="big">⏳</div><p>Loading board...</p></div>';
+
+  await buildBoard(gameId);
+
+  // Start poll every 8s
+  pollTimer = setInterval(() => refreshBoard(gameId), 8000);
+}
+
+// ── BUILD BOARD ───────────────────────────────────────────────────────────────
+async function buildBoard(gameId) {
+  const game = GAMES[gameId];
+  if (!game) return;
+
+  // Fetch from Supabase
+  let row = await sbGet(gameId);
+  currentData = row;
+
+  const owners = row ? (row.owners || {}) : {};
+  const locked = row && row.numbers_locked && row.row_nums && row.row_nums.length === 10;
+  const rowNums = locked ? row.row_nums : shuffle([0,1,2,3,4,5,6,7,8,9]);
+  const colNums = locked ? row.col_nums : shuffle([0,1,2,3,4,5,6,7,8,9]);
+
+  const myKey = \`mySquares_\${gameId}\`;
+  const mySquares = new Set(JSON.parse(localStorage.getItem(myKey) || '[]'));
+  const myInitials = localStorage.getItem(\`initials_\${gameId}\`) || '';
+
+  const soldCount = Object.keys(owners).length;
+  const available = 100 - soldCount;
+
+  // Build HTML
+  let html = \`
+    <div class="board-header">
+      <div>
+        <div class="board-title">\${game.away} @ \${game.home}</div>
+        <div class="board-meta">\${game.sport} · \${game.time}\${locked ? ' · 🔒 Numbers Locked' : ''}</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <div class="avail-badge"><span>\${available}</span> / 100 available</div>
+      </div>
+    </div>
+    <div class="grid-wrap">
+      <div class="squares-grid">
+        <div class="axis-corner"></div>
+        <div class="team-banner" style="grid-column:2/12;">\${game.home}</div>
+        <div class="axis-corner"></div>\`;
+
+  rowNums.forEach(n => { html += \`<div class="axis-top">\${n}</div>\`; });
+
+  for (let r = 0; r < 10; r++) {
+    html += \`<div class="axis-left">\${colNums[r]}</div>\`;
+    for (let c = 0; c < 10; c++) {
+      const idx = r * 10 + c;
+      if (mySquares.has(idx)) {
+        html += \`<div class="cell cell-mine" data-idx="\${idx}">\${myInitials || 'YOU'}</div>\`;
+      } else if (owners[idx] !== undefined) {
+        html += \`<div class="cell cell-sold" data-idx="\${idx}">\${owners[idx]}</div>\`;
+      } else {
+        html += \`<div class="cell cell-open" data-idx="\${idx}" onclick="selectCell(\${idx})"></div>\`;
+      }
+    }
+  }
+
+  html += '</div></div>';
+
+  document.getElementById('boardWrap').innerHTML = html;
+
+  // Show odds card
+  document.getElementById('oddsCard').style.display = 'block';
+  document.getElementById('oddsContent').innerHTML = \`
+    <div style="font-size:12px;color:var(--text2);">Board #1 — \${available} squares open</div>
+  \`;
+}
+
+// ── REFRESH BOARD (poll) ──────────────────────────────────────────────────────
+async function refreshBoard(gameId) {
+  if (currentGameId !== gameId) return;
+  const row = await sbGet(gameId);
+  if (!row) return;
+  const owners = row.owners || {};
+  // Update only sold cells without full re-render
+  document.querySelectorAll('.cell').forEach(cell => {
+    const idx = parseInt(cell.dataset.idx);
+    if (isNaN(idx)) return;
+    if (cell.classList.contains('cell-mine')) return;
+    if (owners[idx] !== undefined) {
+      if (!cell.classList.contains('cell-sold')) {
+        cell.className = 'cell cell-sold';
+        cell.textContent = owners[idx];
+        cell.onclick = null;
+      }
+    } else {
+      if (cell.classList.contains('cell-sold')) {
+        cell.className = 'cell cell-open';
+        cell.textContent = '';
+        cell.onclick = () => selectCell(idx);
+      }
+    }
+  });
+  currentData = row;
+}
+
+// ── FORCE REFRESH ─────────────────────────────────────────────────────────────
+async function forceRefresh() {
+  if (!currentGameId) { showToast('Select a game first', true); return; }
+  await buildBoard(currentGameId);
+  showToast('Board refreshed!');
+}
+
+// ── CLAIM SQUARES ─────────────────────────────────────────────────────────────
+function setQty(n, el) {
+  claimQty = n;
+  document.querySelectorAll('.qty-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+}
+
+function selectCell(idx) {
+  if (!currentGameId) return;
+  const initials = document.getElementById('initialsInput').value.trim().toUpperCase();
+  if (!initials) { showToast('Enter your initials first', true); return; }
+
+  // Pick random available cells
+  const allOpen = Array.from(document.querySelectorAll('.cell-open')).map(c => parseInt(c.dataset.idx));
+  if (allOpen.length < claimQty) { showToast('Not enough squares available', true); return; }
+
+  // Include the clicked cell, fill rest randomly
+  const rest = allOpen.filter(i => i !== idx);
+  const picks = [idx];
+  for (let i = 0; i < claimQty - 1 && rest.length > 0; i++) {
+    const r = Math.floor(Math.random() * rest.length);
+    picks.push(rest.splice(r, 1)[0]);
+  }
+
+  pendingIndices = picks;
+  document.getElementById('modalTitle').textContent = \`Claim \${picks.length} Square\${picks.length > 1 ? 's' : ''}\`;
+  document.getElementById('modalBody').textContent = \`Claim \${picks.length} square\${picks.length > 1 ? 's' : ''} as "\${initials}"? $\${picks.length * 10} total.\`;
+  document.getElementById('confirmModal').classList.add('open');
+}
+
+function claimSquares() {
+  if (!currentGameId) { showToast('Select a game first', true); return; }
+  const initials = document.getElementById('initialsInput').value.trim().toUpperCase();
+  if (!initials) { showToast('Enter your initials first', true); return; }
+
+  const allOpen = Array.from(document.querySelectorAll('.cell-open')).map(c => parseInt(c.dataset.idx));
+  if (allOpen.length < claimQty) { showToast('Not enough open squares', true); return; }
+
+  const picks = [];
+  const pool = [...allOpen];
+  for (let i = 0; i < claimQty; i++) {
+    const r = Math.floor(Math.random() * pool.length);
+    picks.push(pool.splice(r, 1)[0]);
+  }
+
+  pendingIndices = picks;
+  document.getElementById('modalTitle').textContent = \`Claim \${picks.length} Square\${picks.length > 1 ? 's' : ''}\`;
+  document.getElementById('modalBody').textContent = \`Claim \${picks.length} square\${picks.length > 1 ? 's' : ''} as "\${initials}"? $\${picks.length * 10} total.\`;
+  document.getElementById('confirmModal').classList.add('open');
+}
+
+async function confirmClaim() {
+  closeModal();
+  const initials = document.getElementById('initialsInput').value.trim().toUpperCase();
+  const gameId = currentGameId;
+
+  // Get latest data
+  let row = await sbGet(gameId);
+  const owners = row ? { ...(row.owners || {}) } : {};
+
+  // Check none taken since we last loaded
+  for (const idx of pendingIndices) {
+    if (owners[idx] !== undefined) { showToast('Some squares were just taken. Refreshing...', true); await buildBoard(gameId); return; }
+  }
+
+  // Assign
+  pendingIndices.forEach(idx => { owners[idx] = initials; });
+
+  // Save to Supabase
+  const ok = await sbUpsert({
+    game_id: gameId,
+    owners: owners,
+    row_nums: row ? row.row_nums : null,
+    col_nums: row ? row.col_nums : null,
+    numbers_locked: row ? row.numbers_locked : false
+  });
+
+  if (ok) {
+    // Save locally
+    const myKey = \`mySquares_\${gameId}\`;
+    const existing = new Set(JSON.parse(localStorage.getItem(myKey) || '[]'));
+    pendingIndices.forEach(i => existing.add(i));
+    localStorage.setItem(myKey, JSON.stringify([...existing]));
+    localStorage.setItem(\`initials_\${gameId}\`, initials);
+
+    showToast(\`✓ \${pendingIndices.length} square\${pendingIndices.length > 1 ? 's' : ''} claimed!\`);
+    await buildBoard(gameId);
+  } else {
+    showToast('Error saving — try again', true);
+  }
+}
+
+function closeModal() {
+  document.getElementById('confirmModal').classList.remove('open');
+}
+
+// ── LOCK NUMBERS ──────────────────────────────────────────────────────────────
+async function lockNumbers() {
+  if (!currentGameId) { showToast('Select a game first', true); return; }
+  const pin = prompt('Enter admin PIN to lock numbers:');
+  if (pin !== ADMIN_PIN) { alert('Wrong PIN'); return; }
+
+  const topCells = document.querySelectorAll('.axis-top');
+  const leftCells = document.querySelectorAll('.axis-left');
+  const rowNums = Array.from(topCells).map(el => parseInt(el.textContent.trim()));
+  const colNums = Array.from(leftCells).map(el => parseInt(el.textContent.trim()));
+
+  if (rowNums.length !== 10 || colNums.length !== 10) { showToast('Open a board first', true); return; }
+
+  let row = await sbGet(currentGameId);
+  const owners = row ? (row.owners || {}) : {};
+
+  const ok = await sbUpsert({
+    game_id: currentGameId,
+    owners: owners,
+    row_nums: rowNums,
+    col_nums: colNums,
+    numbers_locked: true
+  });
+
+  if (ok) { showToast('🔒 Numbers locked!'); await buildBoard(currentGameId); }
+  else { showToast('Error locking numbers', true); }
+}
+
+// ── RESET BOARD ───────────────────────────────────────────────────────────────
+async function resetBoard() {
+  if (!currentGameId) { showToast('Select a game first', true); return; }
+  const pin = prompt('Enter admin PIN to reset board:');
+  if (pin !== ADMIN_PIN) { alert('Wrong PIN'); return; }
+  if (!confirm(\`Clear ALL squares for this board? This cannot be undone.\`)) return;
+
+  let row = await sbGet(currentGameId);
+
+  const ok = await sbUpsert({
+    game_id: currentGameId,
+    owners: {},
+    row_nums: row ? row.row_nums : null,
+    col_nums: row ? row.col_nums : null,
+    numbers_locked: row ? row.numbers_locked : false
+  });
+
+  if (ok) {
+    // Clear local storage too
+    localStorage.removeItem(\`mySquares_\${currentGameId}\`);
+    localStorage.removeItem(\`initials_\${currentGameId}\`);
+    showToast('✓ Board cleared!');
+    await buildBoard(currentGameId);
+  } else {
+    showToast('Error resetting board', true);
+  }
+}
+
+// ── TOAST ─────────────────────────────────────────────────────────────────────
+function showToast(msg, isError = false) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.borderColor = isError ? 'var(--red)' : 'var(--green)';
+  t.style.color = isError ? 'var(--red)' : 'var(--green)';
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+</script>
+</body>
+</html>
+`;
 
 export default function App() {
   return (
     <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
+      <StatusBar hidden={true} />
+      <WebView
+        source={{ html: htmlContent }}
+        style={styles.webview}
+        javaScriptEnabled={true}
+        originWhitelist={['*']}
+        mediaPlaybackRequiresUserAction={false}
+        allowsInlineMediaPlayback={true}
+        mixedContentMode="always"
+        domStorageEnabled={true}
+      />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
+  container: { flex: 1, backgroundColor: '#FFF8F0' },
+  webview: { flex: 1 },
 });

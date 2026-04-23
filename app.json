@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "kiddolearn",
+    "name": "KiddoLearn",
     "slug": "kiddolearn",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -13,17 +13,23 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "bundleIdentifier": "com.blkmaze.kiddolearn"
     },
     "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      },
-      "edgeToEdgeEnabled": true
+      "package": "com.blkmaze.kiddolearn",
+      "usesCleartextTraffic": true,
+      "allowBackup": false
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "b97e9f87-c0ba-426e-a6f7-00298c4514e5"
+      }
+    },
+    "plugins": [
+      "expo-asset"
+    ]
   }
 }
