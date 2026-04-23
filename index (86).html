@@ -1,0 +1,1936 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>KiddoLearn — Learn & Read</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #FFF8F0;
+  --bg2: #FFF3E8;
+  --card: #FFFFFF;
+  --border: #FFD6A5;
+  --orange: #FF7A2F;
+  --orange2: #FF9A5C;
+  --yellow: #FFD166;
+  --green: #06D6A0;
+  --blue: #118AB2;
+  --pink: #EF476F;
+  --purple: #9B5DE5;
+  --text: #2D2D2D;
+  --text2: #666;
+  --shadow: 0 4px 20px rgba(255,122,47,0.15);
+  --radius: 20px;
+  --font-d: 'Fredoka One', cursive;
+  --font-b: 'Nunito', sans-serif;
+}
+
+/* BEDTIME MODE */
+body.bedtime {
+  --bg: #0D1B2A;
+  --bg2: #112233;
+  --card: #1A2E44;
+  --border: #2A4060;
+  --text: #E8F4FD;
+  --text2: #8BA7C0;
+  --orange: #7B9FBF;
+  --orange2: #5A8AB0;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-b);
+  min-height: 100vh;
+  overflow-x: hidden;
+  transition: background 0.5s, color 0.5s;
+}
+
+/* ── FLOATING BG SHAPES ── */
+.bg-shapes {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+.shape {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0.06;
+  animation: float 8s ease-in-out infinite;
+}
+.shape-1 { width: 300px; height: 300px; background: var(--orange); top: -100px; right: -50px; animation-delay: 0s; }
+.shape-2 { width: 200px; height: 200px; background: var(--blue); bottom: 100px; left: -80px; animation-delay: 2s; }
+.shape-3 { width: 150px; height: 150px; background: var(--purple); top: 40%; right: -40px; animation-delay: 4s; }
+@keyframes float {
+  0%,100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-20px) scale(1.05); }
+}
+
+/* ── SCREENS ── */
+.screen { display: none; position: relative; z-index: 1; min-height: 100vh; }
+.screen.active { display: flex; flex-direction: column; }
+
+/* ── HOME SCREEN ── */
+#home {
+  padding: 24px 20px 40px;
+  align-items: center;
+}
+
+.home-header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+}
+
+.logo {
+  font-family: var(--font-d);
+  font-size: 28px;
+  color: var(--orange);
+  letter-spacing: 0.02em;
+}
+.logo span { color: var(--blue); }
+
+.header-btns { display: flex; gap: 10px; }
+
+.icon-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  border: 2px solid var(--border);
+  background: var(--card);
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+.icon-btn:hover { transform: scale(1.05); }
+
+.hero-mascot {
+  font-size: 80px;
+  margin-bottom: 8px;
+  animation: bounce 2s ease-in-out infinite;
+}
+@keyframes bounce {
+  0%,100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}
+
+.hero-title {
+  font-family: var(--font-d);
+  font-size: 36px;
+  color: var(--text);
+  text-align: center;
+  margin-bottom: 6px;
+}
+.hero-sub {
+  font-size: 16px;
+  color: var(--text2);
+  text-align: center;
+  margin-bottom: 36px;
+  font-weight: 600;
+}
+
+.section-title {
+  font-family: var(--font-d);
+  font-size: 22px;
+  color: var(--text);
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+/* ── MODE CARDS ── */
+.mode-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  width: 100%;
+  max-width: 500px;
+  margin-bottom: 32px;
+}
+
+.mode-card {
+  background: var(--card);
+  border: 2.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px 16px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+  box-shadow: var(--shadow);
+  position: relative;
+  overflow: hidden;
+}
+.mode-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  border-radius: 4px 4px 0 0;
+}
+.mode-card.orange::before { background: var(--orange); }
+.mode-card.blue::before { background: var(--blue); }
+.mode-card.green::before { background: var(--green); }
+.mode-card.purple::before { background: var(--purple); }
+
+.mode-card:hover { transform: translateY(-4px); box-shadow: 0 8px 30px rgba(255,122,47,0.2); }
+.mode-card:active { transform: translateY(0); }
+
+.mode-emoji { font-size: 36px; margin-bottom: 8px; display: block; }
+.mode-name { font-family: var(--font-d); font-size: 16px; color: var(--text); margin-bottom: 4px; }
+.mode-desc { font-size: 12px; color: var(--text2); font-weight: 600; }
+.mode-badge {
+  position: absolute;
+  top: 8px; right: 8px;
+  background: var(--orange);
+  color: white;
+  font-size: 9px;
+  font-weight: 800;
+  padding: 2px 7px;
+  border-radius: 100px;
+  font-family: var(--font-b);
+  letter-spacing: 0.05em;
+}
+
+/* ── STREAK BAR ── */
+.streak-bar {
+  width: 100%;
+  max-width: 500px;
+  background: var(--card);
+  border: 2px solid var(--border);
+  border-radius: 16px;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  box-shadow: var(--shadow);
+}
+.streak-icon { font-size: 28px; }
+.streak-info { flex: 1; }
+.streak-label { font-size: 12px; font-weight: 700; color: var(--text2); text-transform: uppercase; letter-spacing: 0.08em; }
+.streak-val { font-family: var(--font-d); font-size: 22px; color: var(--orange); }
+.streak-dots { display: flex; gap: 6px; }
+.streak-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--border); }
+.streak-dot.done { background: var(--orange); }
+
+/* ── BACK BUTTON ── */
+.back-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--card);
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  padding: 10px 16px;
+  font-family: var(--font-b);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.back-btn:hover { transform: scale(1.02); }
+
+/* ── FLASHCARD SCREEN ── */
+#flashcards {
+  padding: 20px;
+}
+.fc-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.fc-title { font-family: var(--font-d); font-size: 24px; flex: 1; }
+
+.deck-tabs {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  margin-bottom: 24px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.deck-tabs::-webkit-scrollbar { display: none; }
+
+.deck-tab {
+  flex-shrink: 0;
+  background: var(--card);
+  border: 2px solid var(--border);
+  border-radius: 100px;
+  padding: 8px 18px;
+  font-family: var(--font-b);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text2);
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.deck-tab.active {
+  background: var(--orange);
+  border-color: var(--orange);
+  color: white;
+}
+
+/* FLASHCARD */
+.card-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  flex: 1;
+}
+
+.flashcard-wrap {
+  perspective: 1000px;
+  width: min(90vw, 420px);
+  height: min(60vw, 320px);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.flashcard {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.flashcard.flipped { transform: rotateY(180deg); }
+.fc-face {
+  position: absolute;
+  inset: 0;
+  background: var(--card);
+  border: 3px solid var(--border);
+  border-radius: clamp(16px, 4vw, 28px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(6px, 2vw, 14px);
+  backface-visibility: hidden;
+  box-shadow: var(--shadow);
+  padding: clamp(10px, 3vw, 24px);
+}
+.fc-back { transform: rotateY(180deg); }
+.fc-emoji { font-size: clamp(48px, 14vw, 90px); line-height: 1; }
+.fc-letter {
+  font-family: var(--font-d);
+  font-size: clamp(52px, 16vw, 100px);
+  color: var(--orange);
+  line-height: 1;
+}
+.fc-word {
+  font-family: var(--font-d);
+  font-size: clamp(18px, 5vw, 34px);
+  color: var(--text);
+  text-align: center;
+}
+.fc-is-for {
+  font-family: var(--font-b);
+  font-size: clamp(13px, 3.5vw, 22px);
+  font-weight: 800;
+  color: var(--text2);
+  text-align: center;
+  margin-top: -4px;
+}
+.fc-is-for-back {
+  font-family: var(--font-b);
+  font-size: clamp(13px, 3.5vw, 22px);
+  font-weight: 800;
+  color: var(--text2);
+  text-align: center;
+  margin-top: -4px;
+}
+.fc-hint {
+  font-size: 13px;
+  color: var(--text2);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.fc-controls {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: min(90vw, 420px);
+}
+.fc-nav {
+  width: clamp(44px, 12vw, 60px);
+  height: clamp(44px, 12vw, 60px);
+  border-radius: 50%;
+  border: 2.5px solid var(--border);
+  background: var(--card);
+  font-size: clamp(18px, 5vw, 26px);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  flex-shrink: 0;
+}
+.fc-nav:hover { transform: scale(1.1); }
+
+.fc-progress {
+  flex: 1;
+  text-align: center;
+}
+.fc-counter {
+  font-family: var(--font-d);
+  font-size: 18px;
+  color: var(--text2);
+}
+.progress-bar {
+  height: 6px;
+  background: var(--border);
+  border-radius: 10px;
+  margin-top: 6px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  background: var(--orange);
+  border-radius: 10px;
+  transition: width 0.3s;
+}
+
+.speak-btn {
+  background: var(--orange);
+  color: white;
+  border: none;
+  border-radius: 100px;
+  padding: clamp(12px, 3vw, 16px) clamp(20px, 6vw, 32px);
+  font-family: var(--font-d);
+  font-size: clamp(16px, 4vw, 20px);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: all 0.2s;
+  box-shadow: 0 4px 15px rgba(255,122,47,0.4);
+}
+.speak-btn:hover { transform: scale(1.05); }
+.speak-btn:active { transform: scale(0.97); }
+
+/* ── CELEBRATION ── */
+.celebration-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  z-index: 300;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(6px);
+  animation: fadeIn 0.3s ease;
+}
+.celebration-overlay.open { display: flex; }
+@keyframes fadeIn { from{opacity:0} to{opacity:1} }
+
+.celebration-box {
+  background: var(--card);
+  border-radius: 28px;
+  padding: 40px 32px;
+  text-align: center;
+  max-width: 320px;
+  width: 90%;
+  position: relative;
+  overflow: hidden;
+  animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+}
+@keyframes popIn {
+  from { transform: scale(0.5); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.confetti-wrap {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+.confetti-piece {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  animation: confettiFall linear forwards;
+  top: -20px;
+}
+@keyframes confettiFall {
+  0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(400px) rotate(720deg); opacity: 0; }
+}
+
+.celeb-stars {
+  font-size: 28px;
+  margin-bottom: 8px;
+  animation: starPop 0.5s ease 0.2s both;
+}
+@keyframes starPop {
+  from { transform: scale(0); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.celeb-emoji {
+  font-size: 72px;
+  margin-bottom: 12px;
+  animation: bounce 1s ease-in-out infinite;
+  display: block;
+}
+
+.celeb-title {
+  font-family: var(--font-d);
+  font-size: 36px;
+  color: var(--orange);
+  margin-bottom: 8px;
+}
+
+.celeb-sub {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text2);
+  margin-bottom: 8px;
+}
+
+.celeb-score {
+  font-family: var(--font-d);
+  font-size: 22px;
+  color: var(--green);
+  margin-bottom: 24px;
+  min-height: 28px;
+}
+
+.celeb-btn {
+  width: 100%;
+  padding: 16px;
+  background: var(--orange);
+  color: white;
+  border: none;
+  border-radius: 16px;
+  font-family: var(--font-d);
+  font-size: 20px;
+  cursor: pointer;
+  box-shadow: 0 6px 20px rgba(255,122,47,0.4);
+  transition: transform 0.2s;
+}
+.celeb-btn:hover { transform: scale(1.03); }
+
+@media (max-width: 360px) {
+  .celebration-box { padding: 28px 20px; }
+  .celeb-emoji { font-size: 56px; }
+  .celeb-title { font-size: 28px; }
+}
+
+/* Small phones (< 360px) */
+@media (max-width: 360px) {
+  .mode-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .hero-mascot { font-size: 56px; }
+  .hero-title { font-size: 28px; }
+  .memory-grid { grid-template-columns: repeat(4, 1fr); gap: 6px; }
+  .mem-card { font-size: 22px; }
+}
+
+/* Tablets (768px+) */
+@media (min-width: 768px) {
+  .page-wrap { padding: 32px; }
+  #home { align-items: center; padding: 40px; }
+  .mode-grid { grid-template-columns: repeat(4, 1fr); max-width: 700px; }
+  .flashcard-wrap { width: min(60vw, 480px); height: min(40vw, 360px); }
+  .fc-controls { width: min(60vw, 480px); }
+  .memory-grid { grid-template-columns: repeat(4, 1fr); max-width: 500px; gap: 14px; }
+  .mem-card { font-size: 40px; border-radius: 18px; }
+  .story-cards { max-width: 600px; margin: 0 auto; }
+  .stat-cards { max-width: 600px; margin: 0 auto 24px; }
+  #flashcards, #memory, #stories-list, #reader, #dashboard, #settings {
+    padding: 32px;
+    max-width: 700px;
+    margin: 0 auto;
+    width: 100%;
+  }
+  .card-area { align-items: center; }
+}
+
+/* Large screens / desktop (1024px+) */
+@media (min-width: 1024px) {
+  body { display: flex; justify-content: center; }
+  .screen { max-width: 480px; width: 100%; }
+  .bg-shapes { display: none; }
+  #home { padding: 48px 32px; }
+  .flashcard-wrap { width: 400px; height: 300px; }
+  .fc-controls { width: 400px; }
+}
+
+/* ── MEMORY GAME ── */
+#memory {
+  padding: 20px;
+}
+.memory-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.memory-title { font-family: var(--font-d); font-size: 24px; flex: 1; }
+.memory-score {
+  font-family: var(--font-d);
+  font-size: 18px;
+  color: var(--orange);
+  background: var(--card);
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  padding: 6px 16px;
+}
+
+.memory-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  max-width: 400px;
+  margin: 0 auto 20px;
+}
+
+.mem-card {
+  aspect-ratio: 1;
+  background: var(--orange);
+  border-radius: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  transition: all 0.3s;
+  transform-style: preserve-3d;
+  position: relative;
+  box-shadow: 0 3px 10px rgba(255,122,47,0.3);
+}
+.mem-card.revealed { background: var(--card); border: 2.5px solid var(--border); }
+.mem-card.matched { background: var(--green); border: 2.5px solid var(--green); animation: pop 0.3s ease; }
+@keyframes pop { 0%,100%{transform:scale(1)} 50%{transform:scale(1.15)} }
+.mem-card .card-back { display: none; }
+.mem-card.revealed .card-back,
+.mem-card.matched .card-back { display: block; }
+.mem-card .card-front { position: absolute; font-size: 24px; color: white; opacity: 0.4; }
+.mem-card.revealed .card-front,
+.mem-card.matched .card-front { display: none; }
+
+.memory-status {
+  text-align: center;
+  font-family: var(--font-d);
+  font-size: 20px;
+  color: var(--text2);
+}
+
+/* ── STORIES SCREEN ── */
+#stories-list {
+  padding: 20px;
+}
+.stories-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.stories-title { font-family: var(--font-d); font-size: 24px; flex: 1; }
+
+.story-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.story-card {
+  background: var(--card);
+  border: 2.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  box-shadow: var(--shadow);
+}
+.story-card:hover { transform: translateY(-3px); }
+.story-thumb {
+  font-size: 52px;
+  width: 72px;
+  height: 72px;
+  background: var(--bg2);
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.story-info { flex: 1; }
+.story-name { font-family: var(--font-d); font-size: 20px; color: var(--text); margin-bottom: 4px; }
+.story-meta { font-size: 13px; color: var(--text2); font-weight: 600; }
+.story-arrow { font-size: 24px; color: var(--text2); }
+
+/* ── STORY READER ── */
+#reader {
+  padding: 20px;
+}
+.reader-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.reader-title { font-family: var(--font-d); font-size: 20px; flex: 1; }
+
+.story-scene {
+  background: var(--card);
+  border: 2.5px solid var(--border);
+  border-radius: 24px;
+  padding: 24px;
+  margin-bottom: 20px;
+  box-shadow: var(--shadow);
+  text-align: center;
+}
+.scene-emoji { font-size: 100px; margin-bottom: 16px; display: block; animation: sceneFloat 3s ease-in-out infinite; }
+@keyframes sceneFloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+
+.story-text {
+  font-family: var(--font-b);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.6;
+  text-align: center;
+}
+.story-text .word {
+  cursor: pointer;
+  border-radius: 6px;
+  padding: 2px 3px;
+  transition: all 0.15s;
+  display: inline-block;
+}
+.story-text .word:hover { background: var(--yellow); }
+.story-text .word.highlight { background: var(--yellow); transform: scale(1.05); }
+
+.reader-controls {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.reader-btn {
+  padding: 12px 22px;
+  border-radius: 100px;
+  border: 2.5px solid var(--border);
+  background: var(--card);
+  font-family: var(--font-b);
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.reader-btn.primary {
+  background: var(--orange);
+  border-color: var(--orange);
+  color: white;
+  box-shadow: 0 4px 15px rgba(255,122,47,0.4);
+}
+.reader-btn:hover { transform: scale(1.05); }
+
+.page-dots {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+.page-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--border);
+  transition: all 0.3s;
+  cursor: pointer;
+}
+.page-dot.active {
+  background: var(--orange);
+  width: 24px;
+  border-radius: 10px;
+}
+
+.reader-nav {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+.reader-nav-btn {
+  flex: 1;
+  max-width: 160px;
+  padding: 14px;
+  border-radius: 16px;
+  border: 2.5px solid var(--border);
+  background: var(--card);
+  font-family: var(--font-d);
+  font-size: 16px;
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+}
+.reader-nav-btn:hover { border-color: var(--orange); color: var(--orange); }
+.reader-nav-btn.next {
+  background: var(--orange);
+  border-color: var(--orange);
+  color: white;
+}
+
+/* ── PARENT DASHBOARD ── */
+#dashboard {
+  padding: 20px;
+}
+.dash-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.dash-title { font-family: var(--font-d); font-size: 24px; flex: 1; }
+
+.stat-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.stat-card {
+  background: var(--card);
+  border: 2.5px solid var(--border);
+  border-radius: 18px;
+  padding: 18px;
+  box-shadow: var(--shadow);
+}
+.stat-card-icon { font-size: 28px; margin-bottom: 8px; }
+.stat-card-val {
+  font-family: var(--font-d);
+  font-size: 32px;
+  color: var(--orange);
+  line-height: 1;
+  margin-bottom: 4px;
+}
+.stat-card-label { font-size: 12px; font-weight: 700; color: var(--text2); text-transform: uppercase; letter-spacing: 0.06em; }
+
+.activity-title { font-family: var(--font-d); font-size: 20px; margin-bottom: 12px; }
+.activity-list { display: flex; flex-direction: column; gap: 8px; }
+.activity-item {
+  background: var(--card);
+  border: 2px solid var(--border);
+  border-radius: 14px;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.activity-icon { font-size: 24px; }
+.activity-info { flex: 1; }
+.activity-name { font-weight: 700; font-size: 14px; color: var(--text); }
+.activity-time { font-size: 12px; color: var(--text2); }
+.activity-score { font-family: var(--font-d); font-size: 16px; color: var(--green); }
+
+/* ── PREMIUM MODAL ── */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 100;
+  display: none;
+  align-items: flex-end;
+  justify-content: center;
+  backdrop-filter: blur(4px);
+}
+.modal-overlay.open { display: flex; }
+.modal {
+  background: var(--card);
+  border-radius: 28px 28px 0 0;
+  padding: 32px 24px 48px;
+  width: 100%;
+  max-width: 500px;
+  animation: slideUp 0.3s ease;
+}
+@keyframes slideUp { from{transform:translateY(100%)} to{transform:translateY(0)} }
+.modal-handle { width: 40px; height: 4px; background: var(--border); border-radius: 10px; margin: 0 auto 24px; }
+.modal-title { font-family: var(--font-d); font-size: 28px; text-align: center; margin-bottom: 8px; }
+.modal-sub { font-size: 15px; color: var(--text2); text-align: center; margin-bottom: 24px; font-weight: 600; }
+.modal-features { display: flex; flex-direction: column; gap: 10px; margin-bottom: 28px; }
+.modal-feature { display: flex; align-items: center; gap: 12px; font-size: 15px; font-weight: 700; }
+.modal-feature-icon { font-size: 22px; }
+.modal-price {
+  text-align: center;
+  font-family: var(--font-d);
+  font-size: 14px;
+  color: var(--text2);
+  margin-bottom: 16px;
+}
+.modal-price strong { font-size: 36px; color: var(--orange); }
+.modal-cta {
+  width: 100%;
+  padding: 18px;
+  background: var(--orange);
+  color: white;
+  border: none;
+  border-radius: 16px;
+  font-family: var(--font-d);
+  font-size: 20px;
+  cursor: pointer;
+  box-shadow: 0 6px 20px rgba(255,122,47,0.4);
+  transition: all 0.2s;
+  margin-bottom: 12px;
+}
+.modal-cta:hover { transform: scale(1.02); }
+.modal-close {
+  width: 100%;
+  padding: 14px;
+  background: transparent;
+  color: var(--text2);
+  border: none;
+  font-family: var(--font-b);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* ── COMPLETION TOAST ── */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(100px);
+  background: var(--green);
+  color: white;
+  font-family: var(--font-d);
+  font-size: 18px;
+  padding: 14px 28px;
+  border-radius: 100px;
+  z-index: 200;
+  transition: transform 0.3s;
+  white-space: nowrap;
+  box-shadow: 0 4px 20px rgba(6,214,160,0.4);
+}
+.toast.show { transform: translateX(-50%) translateY(0); }
+
+/* ── SETTINGS SCREEN ── */
+#settings {
+  padding: 20px;
+}
+.settings-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.settings-title { font-family: var(--font-d); font-size: 24px; flex: 1; }
+.settings-section { margin-bottom: 24px; }
+.settings-section-title { font-family: var(--font-d); font-size: 18px; margin-bottom: 12px; color: var(--text2); }
+.setting-row {
+  background: var(--card);
+  border: 2px solid var(--border);
+  border-radius: 14px;
+  padding: 16px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+.setting-info { }
+.setting-name { font-weight: 700; font-size: 15px; color: var(--text); }
+.setting-desc { font-size: 12px; color: var(--text2); margin-top: 2px; }
+.toggle {
+  width: 50px;
+  height: 28px;
+  background: var(--border);
+  border-radius: 100px;
+  position: relative;
+  cursor: pointer;
+  transition: background 0.3s;
+  flex-shrink: 0;
+}
+.toggle.on { background: var(--green); }
+.toggle::after {
+  content: '';
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  background: white;
+  border-radius: 50%;
+  top: 3px;
+  left: 3px;
+  transition: transform 0.3s;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+.toggle.on::after { transform: translateX(22px); }
+
+
+</style>
+</head>
+<body>
+
+<div class="bg-shapes">
+  <div class="shape shape-1"></div>
+  <div class="shape shape-2"></div>
+  <div class="shape shape-3"></div>
+</div>
+
+<!-- ══════════════ HOME ══════════════ -->
+<div class="screen active" id="home">
+  <div class="home-header">
+    <div class="logo">Kiddo<span>Learn</span></div>
+    <div class="header-btns">
+      <button class="icon-btn" onclick="showScreen('settings')" title="Settings">⚙️</button>
+      <button class="icon-btn" onclick="showScreen('dashboard')" title="Parent Dashboard">👨‍👩‍👧</button>
+    </div>
+  </div>
+
+  <div class="hero-mascot">🦁</div>
+  <div class="hero-title">Learn & Read!</div>
+  <div class="hero-sub">Tap a mode to start learning 🌟</div>
+
+  <div class="section-title">Choose Activity</div>
+  <div class="mode-grid">
+    <div class="mode-card orange" onclick="showScreen('flashcards')">
+      <span class="mode-emoji">🃏</span>
+      <div class="mode-name">Flashcards</div>
+      <div class="mode-desc">Letters, numbers & more</div>
+    </div>
+    <div class="mode-card blue" onclick="startMemory()">
+      <span class="mode-emoji">🧠</span>
+      <div class="mode-name">Memory</div>
+      <div class="mode-desc">Match the cards!</div>
+    </div>
+    <div class="mode-card green" onclick="showScreen('stories-list')">
+      <span class="mode-emoji">📖</span>
+      <div class="mode-name">Stories</div>
+      <div class="mode-desc">Read-aloud tales</div>
+      <div class="mode-badge">NEW</div>
+    </div>
+    <div class="mode-card purple" onclick="showPremium()">
+      <span class="mode-emoji">⭐</span>
+      <div class="mode-name">All Access</div>
+      <div class="mode-desc">Unlock everything</div>
+      <div class="mode-badge">PRO</div>
+    </div>
+  </div>
+
+  <div class="streak-bar">
+    <div class="streak-icon">🔥</div>
+    <div class="streak-info">
+      <div class="streak-label">Day Streak</div>
+      <div class="streak-val" id="streak-display">3 days</div>
+    </div>
+    <div class="streak-dots" id="streak-dots"></div>
+  </div>
+</div>
+
+<!-- ══════════════ FLASHCARDS ══════════════ -->
+<div class="screen" id="flashcards">
+  <div class="fc-header">
+    <button class="back-btn" onclick="showScreen('home')">← Back</button>
+    <div class="fc-title">Flashcards</div>
+  </div>
+
+  <div class="deck-tabs" id="deck-tabs"></div>
+
+  <div class="card-area">
+    <div class="flashcard-wrap" onclick="flipCard()">
+      <div class="flashcard" id="flashcard">
+        <div class="fc-face fc-front">
+          <div class="fc-emoji" id="fc-front-emoji">🍎</div>
+          <div class="fc-word" id="fc-front-word">Apple</div>
+          <div class="fc-is-for" id="fc-is-for">A is for Apple</div>
+          <div class="fc-hint">👆 Tap to see the letter</div>
+        </div>
+        <div class="fc-face fc-back">
+          <div class="fc-letter" id="fc-back-letter">A</div>
+          <div class="fc-is-for-back" id="fc-is-for-back">is for Apple</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="fc-controls">
+      <button class="fc-nav" onclick="prevCard()">◀</button>
+      <div class="fc-progress">
+        <div class="fc-counter" id="fc-counter">1 / 10</div>
+        <div class="progress-bar"><div class="progress-fill" id="fc-progress" style="width:10%"></div></div>
+      </div>
+      <button class="fc-nav" onclick="nextCard()">▶</button>
+    </div>
+
+    <button class="speak-btn" onclick="speakCurrentCard()">
+      🔊 Hear it!
+    </button>
+  </div>
+</div>
+
+<!-- ══════════════ MEMORY GAME ══════════════ -->
+<div class="screen" id="memory">
+  <div class="memory-header">
+    <button class="back-btn" onclick="showScreen('home')">← Back</button>
+    <div class="memory-title">Memory Match</div>
+    <div class="memory-score">🏆 <span id="match-score">0</span></div>
+  </div>
+
+  <div class="memory-grid" id="memory-grid"></div>
+  <div class="memory-status" id="memory-status">Find all the matching pairs! 🎯</div>
+  <div style="text-align:center;margin-top:16px">
+    <button class="reader-btn primary" onclick="startMemory()" style="display:inline-flex">🔄 New Game</button>
+  </div>
+</div>
+
+<!-- ══════════════ STORIES LIST ══════════════ -->
+<div class="screen" id="stories-list">
+  <div class="stories-header">
+    <button class="back-btn" onclick="showScreen('home')">← Back</button>
+    <div class="stories-title">Storybooks 📖</div>
+  </div>
+
+  <div class="story-cards" id="story-cards"></div>
+</div>
+
+<!-- ══════════════ STORY READER ══════════════ -->
+<div class="screen" id="reader">
+  <div class="reader-header">
+    <button class="back-btn" onclick="showScreen('stories-list')">← Back</button>
+    <div class="reader-title" id="reader-title">The Lion's Big Day</div>
+  </div>
+
+  <div class="story-scene">
+    <span class="scene-emoji" id="scene-emoji">🦁</span>
+    <div class="story-text" id="story-text"></div>
+  </div>
+
+  <div class="page-dots" id="page-dots"></div>
+
+  <div class="reader-controls">
+    <button class="reader-btn primary" onclick="readAloud()">🔊 Read Aloud</button>
+    <button class="reader-btn" onclick="stopReading()">⏹ Stop</button>
+  </div>
+
+  <div class="reader-nav">
+    <button class="reader-nav-btn" id="prev-page-btn" onclick="prevPage()">◀ Prev</button>
+    <button class="reader-nav-btn next" id="next-page-btn" onclick="nextPage()">Next ▶</button>
+  </div>
+</div>
+
+<!-- ══════════════ DASHBOARD ══════════════ -->
+<div class="screen" id="dashboard">
+  <div class="dash-header">
+    <button class="back-btn" onclick="showScreen('home')">← Back</button>
+    <div class="dash-title">Parent Dashboard 👨‍👩‍👧</div>
+  </div>
+
+  <div class="stat-cards">
+    <div class="stat-card">
+      <div class="stat-card-icon">⏱️</div>
+      <div class="stat-card-val" id="stat-time">12</div>
+      <div class="stat-card-label">Minutes Today</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card-icon">🃏</div>
+      <div class="stat-card-val" id="stat-cards">47</div>
+      <div class="stat-card-label">Cards Learned</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card-icon">📖</div>
+      <div class="stat-card-val" id="stat-stories">3</div>
+      <div class="stat-card-label">Stories Read</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card-icon">🔥</div>
+      <div class="stat-card-val" id="stat-streak">3</div>
+      <div class="stat-card-label">Day Streak</div>
+    </div>
+  </div>
+
+  <div class="activity-title">Recent Activity</div>
+  <div class="activity-list" id="activity-list"></div>
+</div>
+
+<!-- ══════════════ SETTINGS ══════════════ -->
+<div class="screen" id="settings">
+  <div class="settings-header">
+    <button class="back-btn" onclick="showScreen('home')">← Back</button>
+    <div class="settings-title">Settings ⚙️</div>
+  </div>
+
+  <div class="settings-section">
+    <div class="settings-section-title">Learning</div>
+    <div class="setting-row">
+      <div class="setting-info">
+        <div class="setting-name">Auto Read Aloud</div>
+        <div class="setting-desc">Speak each card automatically</div>
+      </div>
+      <div class="toggle on" id="toggle-autoread" onclick="toggleSetting('autoread')"></div>
+    </div>
+    <div class="setting-row">
+      <div class="setting-info">
+        <div class="setting-name">Sound Effects</div>
+        <div class="setting-desc">Play sounds on actions</div>
+      </div>
+      <div class="toggle on" id="toggle-sounds" onclick="toggleSetting('sounds')"></div>
+    </div>
+  </div>
+
+  <div class="settings-section">
+    <div class="settings-section-title">Display</div>
+    <div class="setting-row">
+      <div class="setting-info">
+        <div class="setting-name">Bedtime Mode</div>
+        <div class="setting-desc">Soft colors for nighttime</div>
+      </div>
+      <div class="toggle" id="toggle-bedtime" onclick="toggleSetting('bedtime')"></div>
+    </div>
+  </div>
+
+  <div class="settings-section">
+    <div class="settings-section-title">About</div>
+    <div class="setting-row">
+      <div class="setting-info">
+        <div class="setting-name">MAZE KIDS</div>
+        <div class="setting-desc">Version 1.0 · Made with ❤️ for little learners</div>
+      </div>
+    </div>
+    <div class="setting-row" onclick="showPremium()" style="cursor:pointer">
+      <div class="setting-info">
+        <div class="setting-name">🌟 Upgrade to Premium</div>
+        <div class="setting-desc">Unlock all decks, stories & more</div>
+      </div>
+      <div style="color:var(--orange);font-size:20px">›</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ PREMIUM MODAL ══════════════ -->
+<div class="modal-overlay" id="premium-modal" onclick="closePremium(event)">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div style="font-size:48px;text-align:center;margin-bottom:12px">⭐</div>
+    <div class="modal-title">Go Premium!</div>
+    <div class="modal-sub">Unlock the full MAZE KIDS experience</div>
+    <div class="modal-features">
+      <div class="modal-feature"><span class="modal-feature-icon">🃏</span> All 8 flashcard decks (500+ cards)</div>
+      <div class="modal-feature"><span class="modal-feature-icon">📖</span> All 15 storybooks with narration</div>
+      <div class="modal-feature"><span class="modal-feature-icon">🧠</span> All mini-games unlocked</div>
+      <div class="modal-feature"><span class="modal-feature-icon">📊</span> Full parent dashboard & reports</div>
+      <div class="modal-feature"><span class="modal-feature-icon">🌙</span> Bedtime mode & calm audio</div>
+      <div class="modal-feature"><span class="modal-feature-icon">📵</span> 100% ad-free, forever</div>
+    </div>
+    <div class="modal-price">Just <strong>$3.99</strong>/month · Cancel anytime</div>
+    <button class="modal-cta" onclick="unlockPremium()">🚀 Start Free Trial</button>
+    <button class="modal-close" onclick="closePremium()">Maybe later</button>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast">🎉 Great job!</div>
+
+<script>
+// ══════════════════════════════════════
+// DATA
+// ══════════════════════════════════════
+
+const DECKS = {
+  Letters: [
+    {front:'A', emoji:'🍎', word:'Apple'},
+    {front:'B', emoji:'🐻', word:'Bear'},
+    {front:'C', emoji:'🐱', word:'Cat'},
+    {front:'D', emoji:'🐶', word:'Dog'},
+    {front:'E', emoji:'🥚', word:'Egg'},
+    {front:'F', emoji:'🐸', word:'Frog'},
+    {front:'G', emoji:'🍇', word:'Grape'},
+    {front:'H', emoji:'🏠', word:'House'},
+    {front:'I', emoji:'🍦', word:'Ice Cream'},
+    {front:'J', emoji:'🧃', word:'Juice'},
+    {front:'K', emoji:'🪁', word:'Kite'},
+    {front:'L', emoji:'🦁', word:'Lion'},
+    {front:'M', emoji:'🌙', word:'Moon'},
+    {front:'N', emoji:'🪺', word:'Nest'},
+    {front:'O', emoji:'🦉', word:'Owl'},
+    {front:'P', emoji:'🐧', word:'Penguin'},
+    {front:'Q', emoji:'👑', word:'Queen'},
+    {front:'R', emoji:'🌈', word:'Rainbow'},
+    {front:'S', emoji:'⭐', word:'Star'},
+    {front:'T', emoji:'🐢', word:'Turtle'},
+    {front:'U', emoji:'☂️', word:'Umbrella'},
+    {front:'V', emoji:'🎻', word:'Violin'},
+    {front:'W', emoji:'🐋', word:'Whale'},
+    {front:'X', emoji:'🎄', word:'Xmas Tree'},
+    {front:'Y', emoji:'🪀', word:'Yo-yo'},
+    {front:'Z', emoji:'🦓', word:'Zebra'},
+  ],
+  Counting: [
+    {front:'1', emoji:'🌟', word:'One'},
+    {front:'2', emoji:'👀', word:'Two'},
+    {front:'3', emoji:'🍀', word:'Three'},
+    {front:'4', emoji:'🐾', word:'Four'},
+    {front:'5', emoji:'✋', word:'Five'},
+    {front:'6', emoji:'🎲', word:'Six'},
+    {front:'7', emoji:'🌈', word:'Seven'},
+    {front:'8', emoji:'🐙', word:'Eight'},
+    {front:'9', emoji:'🎈', word:'Nine'},
+    {front:'10', emoji:'🔟', word:'Ten'},
+  ],
+  Shapes: [
+    {front:'⭕', emoji:'⭕', word:'Circle'},
+    {front:'🔷', emoji:'🔷', word:'Diamond'},
+    {front:'❤️', emoji:'❤️', word:'Heart'},
+    {front:'⬛', emoji:'⬛', word:'Square'},
+    {front:'🔺', emoji:'🔺', word:'Triangle'},
+    {front:'▬', emoji:'📄', word:'Rectangle'},
+    {front:'⭐', emoji:'⭐', word:'Star'},
+    {front:'🥚', emoji:'🥚', word:'Oval'},
+  ],
+  Colors: [
+    {front:'🔴', emoji:'🍎', word:'Red'},
+    {front:'🔵', emoji:'🫐', word:'Blue'},
+    {front:'🟢', emoji:'🍀', word:'Green'},
+    {front:'🟡', emoji:'⭐', word:'Yellow'},
+    {front:'🟠', emoji:'🍊', word:'Orange'},
+    {front:'🟣', emoji:'🍇', word:'Purple'},
+    {front:'⚫', emoji:'🖤', word:'Black'},
+    {front:'⚪', emoji:'🐑', word:'White'},
+    {front:'🩷', emoji:'🌸', word:'Pink'},
+    {front:'🟤', emoji:'🐻', word:'Brown'},
+  ],
+  Animals: [
+    {front:'🦁', emoji:'🦁', word:'Lion'},
+    {front:'🐘', emoji:'🐘', word:'Elephant'},
+    {front:'🦒', emoji:'🦒', word:'Giraffe'},
+    {front:'🐧', emoji:'🐧', word:'Penguin'},
+    {front:'🦊', emoji:'🦊', word:'Fox'},
+    {front:'🐬', emoji:'🐬', word:'Dolphin'},
+    {front:'🦋', emoji:'🦋', word:'Butterfly'},
+    {front:'🐢', emoji:'🐢', word:'Turtle'},
+    {front:'🦉', emoji:'🦉', word:'Owl'},
+    {front:'🐨', emoji:'🐨', word:'Koala'},
+  ],
+  Colors: [
+    {front:'🔴', emoji:'🍎', word:'Red'},
+    {front:'🔵', emoji:'🫐', word:'Blue'},
+    {front:'🟢', emoji:'🍀', word:'Green'},
+    {front:'🟡', emoji:'⭐', word:'Yellow'},
+    {front:'🟠', emoji:'🍊', word:'Orange'},
+    {front:'🟣', emoji:'🍇', word:'Purple'},
+    {front:'⚫', emoji:'🐦‍⬛', word:'Black'},
+    {front:'⚪', emoji:'🐑', word:'White'},
+    {front:'🩷', emoji:'🌸', word:'Pink'},
+    {front:'🟤', emoji:'🐻', word:'Brown'},
+  ],
+  Shapes: [
+    {front:'⭕', emoji:'🍕', word:'Circle'},
+    {front:'🟥', emoji:'📦', word:'Square'},
+    {front:'🔺', emoji:'🏔️', word:'Triangle'},
+    {front:'▬', emoji:'📱', word:'Rectangle'},
+    {front:'⭐', emoji:'🌟', word:'Star'},
+    {front:'🫀', emoji:'💝', word:'Heart'},
+    {front:'🔷', emoji:'💎', word:'Diamond'},
+    {front:'🔶', emoji:'🪁', word:'Oval'},
+    {front:'⬡', emoji:'🍯', word:'Hexagon'},
+    {front:'🌙', emoji:'🌙', word:'Crescent'},
+  ],
+};
+
+const STORIES = [
+  {
+    id: 0,
+    name: "The Lion's Big Day",
+    emoji: '🦁',
+    age: '3-5 years',
+    pages: [
+      { emoji: '🦁', text: 'Leo the lion woke up one bright morning.' },
+      { emoji: '☀️', text: 'The sun was warm and golden in the sky.' },
+      { emoji: '🌿', text: 'Leo walked through the tall green grass.' },
+      { emoji: '🦁🐘', text: 'He met his friend Ella the elephant.' },
+      { emoji: '💧', text: 'They walked together to the cool blue river.' },
+      { emoji: '🎉', text: 'It was the best day ever for Leo!' },
+    ]
+  },
+  {
+    id: 1,
+    name: "Benny Finds a Star",
+    emoji: '⭐',
+    age: '4-6 years',
+    pages: [
+      { emoji: '🐻', text: 'Benny the bear looked up at the dark night sky.' },
+      { emoji: '⭐', text: 'One little star was falling down, down, down.' },
+      { emoji: '🌿', text: 'It landed softly in the meadow near his home.' },
+      { emoji: '✨', text: 'The star glowed and sparkled with magic light.' },
+      { emoji: '🐻⭐', text: 'Benny held the star gently in his big paws.' },
+      { emoji: '🌙', text: 'He placed it back up high where it belonged.' },
+    ]
+  },
+  {
+    id: 2,
+    name: "The Rainbow Bridge",
+    emoji: '🌈',
+    age: '3-5 years',
+    pages: [
+      { emoji: '🌧️', text: 'It rained all morning in the little town.' },
+      { emoji: '🐸', text: 'Fiona the frog danced in every puddle.' },
+      { emoji: '☀️', text: 'Then the sun came out from behind the clouds.' },
+      { emoji: '🌈', text: 'A beautiful rainbow stretched across the sky.' },
+      { emoji: '🐸🦋', text: 'Fiona and her friends ran to find the end.' },
+      { emoji: '🍀', text: 'They found a field of lucky clovers instead!' },
+    ]
+  },
+];
+
+const MEMORY_EMOJIS = ['🦁','🐘','🦒','🐧','🦊','🐬','🦋','🐢'];
+
+// ══════════════════════════════════════
+// STATE
+// ══════════════════════════════════════
+
+let currentDeck = 'Letters';
+let currentCardIndex = 0;
+let isFlipped = false;
+let currentStory = null;
+let currentPage = 0;
+let isSpeaking = false;
+let memCards = [];
+let revealed = [];
+let matched = [];
+let lockBoard = false;
+let matchScore = 0;
+let settings = { autoread: true, sounds: true, bedtime: false };
+let stats = { time: 12, cards: 47, stories: 3, streak: 3 };
+let activities = [
+  { icon: '🃏', name: 'Flashcards - Letters', time: 'Today, 3:45 PM', score: '10/10' },
+  { icon: '🧠', name: 'Memory Match', time: 'Today, 3:30 PM', score: '8 pairs' },
+  { icon: '📖', name: "The Lion's Big Day", time: 'Yesterday', score: '⭐⭐⭐' },
+];
+
+// ══════════════════════════════════════
+// NAVIGATION
+// ══════════════════════════════════════
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+// ══════════════════════════════════════
+// FLASHCARDS
+// ══════════════════════════════════════
+
+function initFlashcards() {
+  // Build tabs
+  const tabs = document.getElementById('deck-tabs');
+  tabs.innerHTML = '';
+  Object.keys(DECKS).forEach(deck => {
+    const tab = document.createElement('button');
+    tab.className = 'deck-tab' + (deck === currentDeck ? ' active' : '');
+    tab.textContent = deck;
+    tab.onclick = () => selectDeck(deck);
+    tabs.appendChild(tab);
+  });
+  renderCard();
+}
+
+function selectDeck(deck) {
+  currentDeck = deck;
+  currentCardIndex = 0;
+  isFlipped = false;
+  document.querySelectorAll('.deck-tab').forEach(t => t.classList.toggle('active', t.textContent === deck));
+  renderCard();
+}
+
+function renderCard() {
+  const deck = DECKS[currentDeck];
+  const card = deck[currentCardIndex];
+  const fc = document.getElementById('flashcard');
+  fc.classList.remove('flipped');
+  isFlipped = false;
+
+  // FRONT — show the product (emoji + word)
+  document.getElementById('fc-front-emoji').textContent = card.emoji;
+  document.getElementById('fc-front-word').textContent = card.word;
+
+  const isForEl = document.getElementById('fc-is-for');
+  if (currentDeck === 'Letters') {
+    isForEl.textContent = `${card.front} is for ${card.word}`;
+  } else if (currentDeck === 'Numbers') {
+    isForEl.textContent = card.word;
+  } else if (currentDeck === 'Shapes') {
+    isForEl.textContent = `This is a ${card.word}`;
+  } else {
+    isForEl.textContent = card.word;
+  }
+
+  // BACK — show the letter/number
+  const backLetter = document.getElementById('fc-back-letter');
+  backLetter.textContent = card.front;
+  backLetter.style.fontSize = currentDeck === 'Animals' || currentDeck === 'Colors' ? '64px' : '80px';
+
+  const isForBack = document.getElementById('fc-is-for-back');
+  if (currentDeck === 'Letters') {
+    isForBack.textContent = `is for ${card.word}`;
+  } else {
+    isForBack.textContent = card.word;
+  }
+
+  // Counter
+  document.getElementById('fc-counter').textContent = `${currentCardIndex + 1} / ${deck.length}`;
+  document.getElementById('fc-progress').style.width = `${((currentCardIndex + 1) / deck.length) * 100}%`;
+
+  if (settings.autoread) setTimeout(() => speakTeacher(buildPhrase(card)), 400);
+}
+
+function flipCard() {
+  const fc = document.getElementById('flashcard');
+  isFlipped = !isFlipped;
+  fc.classList.toggle('flipped', isFlipped);
+  if (isFlipped) {
+    const card = DECKS[currentDeck][currentCardIndex];
+    speak(card.word);
+  }
+}
+
+function nextCard() {
+  const deck = DECKS[currentDeck];
+  const isLast = currentCardIndex === deck.length - 1;
+  currentCardIndex = (currentCardIndex + 1) % deck.length;
+  if (isLast) {
+    showCelebration({
+      emoji: '🎓',
+      title: 'You Did It!',
+      sub: `${currentDeck} deck complete!`,
+      score: `${deck.length} cards learned! ⭐`
+    });
+  }
+  renderCard();
+  stats.cards++;
+}
+
+function prevCard() {
+  const deck = DECKS[currentDeck];
+  currentCardIndex = (currentCardIndex - 1 + deck.length) % deck.length;
+  renderCard();
+}
+
+function speakCurrentCard() {
+  const card = DECKS[currentDeck][currentCardIndex];
+  speak(card.word);
+}
+
+// ══════════════════════════════════════
+// MEMORY GAME
+// ══════════════════════════════════════
+
+function startMemory() {
+  showScreen('memory');
+  matchScore = 0;
+  revealed = [];
+  matched = [];
+  lockBoard = false;
+  document.getElementById('match-score').textContent = '0';
+  document.getElementById('memory-status').textContent = 'Find all the matching pairs! 🎯';
+
+  const pairs = [...MEMORY_EMOJIS, ...MEMORY_EMOJIS];
+  memCards = pairs.sort(() => Math.random() - 0.5);
+
+  const grid = document.getElementById('memory-grid');
+  grid.innerHTML = '';
+  memCards.forEach((emoji, i) => {
+    const card = document.createElement('div');
+    card.className = 'mem-card';
+    card.dataset.index = i;
+    card.innerHTML = `<span class="card-front">?</span><span class="card-back">${emoji}</span>`;
+    card.onclick = () => revealCard(i, card);
+    grid.appendChild(card);
+  });
+}
+
+function revealCard(index, el) {
+  if (lockBoard || matched.includes(index) || revealed.includes(index)) return;
+  el.classList.add('revealed');
+  revealed.push(index);
+
+  if (revealed.length === 2) {
+    lockBoard = true;
+    const [a, b] = revealed;
+    if (memCards[a] === memCards[b]) {
+      matched.push(a, b);
+      matchScore++;
+      document.getElementById('match-score').textContent = matchScore;
+      document.querySelectorAll('.mem-card')[a].classList.add('matched');
+      document.querySelectorAll('.mem-card')[b].classList.add('matched');
+      revealed = [];
+      lockBoard = false;
+      speak(memCards[a]);
+      if (matched.length === memCards.length) {
+        document.getElementById('memory-status').textContent = '🏆 You matched them all!';
+        setTimeout(() => showCelebration({
+          emoji: '🧠',
+          title: 'Memory Master!',
+          sub: 'You matched all the pairs!',
+          score: `${matchScore} perfect matches! 🏆`
+        }), 400);
+      }
+    } else {
+      setTimeout(() => {
+        document.querySelectorAll('.mem-card')[a].classList.remove('revealed');
+        document.querySelectorAll('.mem-card')[b].classList.remove('revealed');
+        revealed = [];
+        lockBoard = false;
+      }, 900);
+    }
+  }
+}
+
+// ══════════════════════════════════════
+// STORIES
+// ══════════════════════════════════════
+
+function initStories() {
+  const container = document.getElementById('story-cards');
+  container.innerHTML = '';
+  STORIES.forEach(story => {
+    const card = document.createElement('div');
+    card.className = 'story-card';
+    card.innerHTML = `
+      <div class="story-thumb">${story.emoji}</div>
+      <div class="story-info">
+        <div class="story-name">${story.name}</div>
+        <div class="story-meta">Ages ${story.age} · ${story.pages.length} pages</div>
+      </div>
+      <div class="story-arrow">›</div>
+    `;
+    card.onclick = () => openStory(story.id);
+    container.appendChild(card);
+  });
+}
+
+function openStory(id) {
+  currentStory = STORIES[id];
+  currentPage = 0;
+  document.getElementById('reader-title').textContent = currentStory.name;
+  renderPage();
+  showScreen('reader');
+  stats.stories++;
+  addActivity({ icon: '📖', name: currentStory.name, time: 'Just now', score: '⭐⭐⭐' });
+}
+
+function renderPage() {
+  const page = currentStory.pages[currentPage];
+  document.getElementById('scene-emoji').textContent = page.emoji;
+
+  // Word-by-word with clickable spans
+  const words = page.text.split(' ');
+  const textEl = document.getElementById('story-text');
+  textEl.innerHTML = words.map((w, i) =>
+    `<span class="word" onclick="speakWord('${w.replace(/[^a-zA-Z]/g,'')}', this)">${w}</span>`
+  ).join(' ');
+
+  // Page dots
+  const dots = document.getElementById('page-dots');
+  dots.innerHTML = currentStory.pages.map((_, i) =>
+    `<div class="page-dot ${i === currentPage ? 'active' : ''}" onclick="goToPage(${i})"></div>`
+  ).join('');
+
+  // Nav buttons
+  document.getElementById('prev-page-btn').style.opacity = currentPage === 0 ? '0.4' : '1';
+  document.getElementById('next-page-btn').textContent = currentPage === currentStory.pages.length - 1 ? '🎉 Done!' : 'Next ▶';
+}
+
+function goToPage(i) {
+  stopReading();
+  currentPage = i;
+  renderPage();
+}
+
+function nextPage() {
+  stopReading();
+  if (currentPage < currentStory.pages.length - 1) {
+    currentPage++;
+    renderPage();
+  } else {
+    showCelebration({
+      emoji: '📖',
+      title: 'Story Complete!',
+      sub: currentStory.name,
+      score: '⭐⭐⭐ Great reading!'
+    });
+    setTimeout(() => showScreen('stories-list'), 100);
+  }
+}
+
+function prevPage() {
+  stopReading();
+  if (currentPage > 0) {
+    currentPage--;
+    renderPage();
+  }
+}
+
+function readAloud() {
+  const page = currentStory.pages[currentPage];
+  const words = document.querySelectorAll('.story-text .word');
+  stopReading();
+
+  const utterance = new SpeechSynthesisUtterance(page.text);
+  if (teacherVoice) utterance.voice = teacherVoice;
+  utterance.rate = 0.72;
+  utterance.pitch = 0.95;
+  utterance.volume = 0.75;
+
+  let wordIndex = 0;
+  utterance.onboundary = (e) => {
+    words.forEach(w => w.classList.remove('highlight'));
+    if (wordIndex < words.length) {
+      words[wordIndex].classList.add('highlight');
+      wordIndex++;
+    }
+  };
+  utterance.onend = () => {
+    words.forEach(w => w.classList.remove('highlight'));
+  };
+
+  window.speechSynthesis.speak(utterance);
+}
+
+function stopReading() {
+  window.speechSynthesis.cancel();
+  document.querySelectorAll('.story-text .word').forEach(w => w.classList.remove('highlight'));
+}
+
+function speakWord(word, el) {
+  document.querySelectorAll('.story-text .word').forEach(w => w.classList.remove('highlight'));
+  el.classList.add('highlight');
+  speak(word);
+  setTimeout(() => el.classList.remove('highlight'), 1500);
+}
+
+// ══════════════════════════════════════
+// SPEECH — Warm Teacher Voice
+// ══════════════════════════════════════
+
+let teacherVoice = null;
+
+function loadTeacherVoice() {
+  if (!('speechSynthesis' in window)) return;
+  const load = () => {
+    const voices = window.speechSynthesis.getVoices();
+    // Priority order: prefer female US English voices
+    const preferred = [
+      'Samantha', 'Karen', 'Moira', 'Fiona', // macOS/iOS female
+      'Microsoft Zira', 'Microsoft Jenny',     // Windows female
+      'Google US English',                      // Chrome female
+    ];
+    for (const name of preferred) {
+      const v = voices.find(v => v.name.includes(name));
+      if (v) { teacherVoice = v; break; }
+    }
+    // Fallback: any female en-US voice
+    if (!teacherVoice) {
+      teacherVoice = voices.find(v =>
+        v.lang.startsWith('en') && v.name.toLowerCase().includes('female')
+      ) || voices.find(v => v.lang.startsWith('en')) || null;
+    }
+  };
+  if (window.speechSynthesis.getVoices().length) load();
+  window.speechSynthesis.onvoiceschanged = load;
+}
+
+function buildPhrase(card) {
+  if (currentDeck === 'Letters') return `${card.front} is for ${card.word}. ${card.word}.`;
+  if (currentDeck === 'Numbers') return `The number ${card.front}. ${card.word}.`;
+  if (currentDeck === 'Animals') return `This is a ${card.word}!`;
+  if (currentDeck === 'Colors') return `The color ${card.word}.`;
+  if (currentDeck === 'Shapes') return `This shape is a ${card.word}. ${card.word}.`;
+  return card.word;
+}
+
+function speakTeacher(text) {
+  if (!('speechSynthesis' in window)) return;
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  if (teacherVoice) u.voice = teacherVoice;
+  u.rate = 0.72;    // gentle and clear
+  u.pitch = 0.95;   // soft, calm — not high or loud
+  u.volume = 0.75;  // quieter, not shouting
+  window.speechSynthesis.speak(u);
+}
+
+function speak(text) {
+  speakTeacher(text);
+}
+
+// ══════════════════════════════════════
+// DASHBOARD
+// ══════════════════════════════════════
+
+function initDashboard() {
+  document.getElementById('stat-time').textContent = stats.time;
+  document.getElementById('stat-cards').textContent = stats.cards;
+  document.getElementById('stat-stories').textContent = stats.stories;
+  document.getElementById('stat-streak').textContent = stats.streak;
+
+  const list = document.getElementById('activity-list');
+  list.innerHTML = activities.map(a => `
+    <div class="activity-item">
+      <div class="activity-icon">${a.icon}</div>
+      <div class="activity-info">
+        <div class="activity-name">${a.name}</div>
+        <div class="activity-time">${a.time}</div>
+      </div>
+      <div class="activity-score">${a.score}</div>
+    </div>
+  `).join('');
+}
+
+function addActivity(activity) {
+  activities.unshift(activity);
+  if (activities.length > 10) activities.pop();
+}
+
+// ══════════════════════════════════════
+// SETTINGS
+// ══════════════════════════════════════
+
+function toggleSetting(key) {
+  settings[key] = !settings[key];
+  const toggle = document.getElementById('toggle-' + key);
+  toggle.classList.toggle('on', settings[key]);
+  if (key === 'bedtime') {
+    document.body.classList.toggle('bedtime', settings.bedtime);
+  }
+}
+
+// ══════════════════════════════════════
+// PREMIUM
+// ══════════════════════════════════════
+
+function showPremium() {
+  document.getElementById('premium-modal').classList.add('open');
+}
+
+function closePremium(e) {
+  if (!e || e.target === document.getElementById('premium-modal')) {
+    document.getElementById('premium-modal').classList.remove('open');
+  }
+}
+
+function unlockPremium() {
+  closePremium();
+  showToast('🌟 Welcome to Premium!');
+}
+
+// ══════════════════════════════════════
+// CELEBRATION
+// ══════════════════════════════════════
+
+const CONFETTI_COLORS = ['#FF7A2F','#FFD166','#06D6A0','#118AB2','#9B5DE5','#EF476F','#FFD166'];
+
+function showCelebration({ emoji, title, sub, score }) {
+  document.getElementById('celeb-emoji').textContent = emoji;
+  document.getElementById('celeb-title').textContent = title;
+  document.getElementById('celeb-sub').textContent = sub;
+  document.getElementById('celeb-score').textContent = score || '';
+
+  // Launch confetti
+  const wrap = document.getElementById('confetti-wrap');
+  wrap.innerHTML = '';
+  for (let i = 0; i < 40; i++) {
+    const piece = document.createElement('div');
+    piece.className = 'confetti-piece';
+    piece.style.cssText = `
+      left: ${Math.random() * 100}%;
+      background: ${CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)]};
+      width: ${Math.random() * 8 + 6}px;
+      height: ${Math.random() * 8 + 6}px;
+      border-radius: ${Math.random() > 0.5 ? '50%' : '2px'};
+      animation-duration: ${Math.random() * 1.5 + 1}s;
+      animation-delay: ${Math.random() * 0.5}s;
+    `;
+    wrap.appendChild(piece);
+  }
+
+  document.getElementById('celebration').classList.add('open');
+  speakTeacher(`${title} Amazing job! You are so smart!`);
+  stats.streak = Math.min(stats.streak + 1, 7);
+  initStreak();
+}
+
+function closeCelebration() {
+  document.getElementById('celebration').classList.remove('open');
+  document.getElementById('confetti-wrap').innerHTML = '';
+}
+
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2500);
+}
+
+// ══════════════════════════════════════
+// STREAK
+// ══════════════════════════════════════
+
+function initStreak() {
+  const dots = document.getElementById('streak-dots');
+  dots.innerHTML = Array(7).fill(0).map((_, i) =>
+    `<div class="streak-dot ${i < stats.streak ? 'done' : ''}"></div>`
+  ).join('');
+  document.getElementById('streak-display').textContent = `${stats.streak} days`;
+}
+
+// ══════════════════════════════════════
+// SCREEN CHANGE HOOKS
+// ══════════════════════════════════════
+
+const originalShowScreen = showScreen;
+window.showScreen = function(id) {
+  originalShowScreen(id);
+  if (id === 'flashcards') initFlashcards();
+  if (id === 'stories-list') initStories();
+  if (id === 'dashboard') initDashboard();
+};
+
+// ══════════════════════════════════════
+// INIT
+// ══════════════════════════════════════
+
+loadTeacherVoice();
+initStreak();
+</script>
+<!-- ══════════════ CELEBRATION ══════════════ -->
+<div class="celebration-overlay" id="celebration">
+  <div class="celebration-box">
+    <div class="confetti-wrap" id="confetti-wrap"></div>
+    <div class="celeb-stars">⭐⭐⭐</div>
+    <div class="celeb-emoji" id="celeb-emoji">🎉</div>
+    <div class="celeb-title" id="celeb-title">Amazing!</div>
+    <div class="celeb-sub" id="celeb-sub">You finished the deck!</div>
+    <div class="celeb-score" id="celeb-score"></div>
+    <button class="celeb-btn" onclick="closeCelebration()">Keep Learning! 🚀</button>
+  </div>
+</div>
+
+</body>
+</html>
