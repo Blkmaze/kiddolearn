@@ -102,8 +102,7 @@ export default function App() {
         javaScriptEnabled={true} originWhitelist={["*"]}
         mediaPlaybackRequiresUserAction={false} allowsInlineMediaPlayback={true}
         mixedContentMode="always" domStorageEnabled={true} onMessage={handleMessage}
-        onError={(e) => { stopAll(); }}
-        onNavigationStateChange={() => { stopAll(); }}/>
+        onError={(e) => { console.log("WebView error:", e.nativeEvent); stopAll(); }}/>
     </View>
   );
 }
