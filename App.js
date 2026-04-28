@@ -33,38 +33,67 @@ export default function App() {
     return () => { if(soundRef.current){try{soundRef.current.unloadAsync();}catch(e){}} };
   }, []);
   const stopAll = async () => {
-    Speech.stop();
-    if(soundRef.current){try{await soundRef.current.stopAsync();await soundRef.current.unloadAsync();}catch(e){}soundRef.current=null;}
+    try { Speech.stop(); } catch(e) {}
+    if(soundRef.current){
+      try {
+        await soundRef.current.stopAsync();
+        await soundRef.current.unloadAsync();
+      } catch(e) {}
+      soundRef.current = null;
+    }
   };
   const playAnimalSound = async (animalKey, fallbackText) => {
     await stopAll();
     try {
       const soundFile = ANIMAL_SOUNDS[animalKey];
-      if(soundFile){
-        const {sound} = await Audio.Sound.createAsync(soundFile,{shouldPlay:true});
-        soundRef.current = sound;
-        sound.setOnPlaybackStatusUpdate((status) => {
-          if(status.didJustFinish){
-            try{sound.unloadAsync();}catch(e){}
-            soundRef.current=null;
-            if(fallbackText) setTimeout(()=>Speech.speak(fallbackText,{language:"en-US",pitch:0.85,rate:0.65,volume:0.6}),200);
-          }
-        });
-      } else if(fallbackText){
-        Speech.speak(fallbackText,{language:"en-US",pitch:0.85,rate:0.65,volume:0.6});
+      if(!soundFile) {
+        if(fallbackText) Speech.speak(fallbackText,{language:"en-US",pitch:0.85,rate:0.65,volume:0.6});
+        return;
       }
+      const {sound} = await Audio.Sound.createAsync(soundFile,{shouldPlay:true,volume:1.0});
+      soundRef.current = sound;
+      sound.setOnPlaybackStatusUpdate((status) => {
+        if(status.isLoaded && status.didJustFinish){
+          try{sound.unloadAsync();}catch(e){}
+          soundRef.current = null;
+          if(fallbackText) setTimeout(()=>Speech.speak(fallbackText,{language:"en-US",pitch:0.85,rate:0.65,volume:0.6}),300);
+        }
+        if(status.error){
+          try{sound.unloadAsync();}catch(e){}
+          soundRef.current = null;
+          if(fallbackText) Speech.speak(fallbackText,{language:"en-US",pitch:0.85,rate:0.65,volume:0.6});
+        }
+      });
     } catch(e){
+      console.log("Animal sound error:", animalKey, e.message);
       if(fallbackText) Speech.speak(fallbackText,{language:"en-US",pitch:0.85,rate:0.65,volume:0.6});
     }
   };
   const handleMessage = (event) => {
     try {
       const data = JSON.parse(event.nativeEvent.data);
-      if(data.type==="SPEAK"){stopAll();Speech.speak(data.text,{language:"en-US",pitch:0.85,rate:0.65,volume:0.6});}
-      else if(data.type==="SPEAK_STORY"){stopAll();Speech.speak(data.text,{language:"en-US",pitch:0.85,rate:0.60,volume:0.55});}
-      else if(data.type==="STOP"){stopAll();}
-      else if(data.type==="PLAY_ANIMAL"){playAnimalSound(data.audio,data.text);}
-    } catch(e){}
+      if(data.type==="SPEAK"){
+        stopAll();
+        if(data.text && data.text.trim()) {
+          Speech.speak(data.text,{language:"en-US",pitch:0.85,rate:0.65,volume:0.6});
+        }
+      }
+      else if(data.type==="SPEAK_STORY"){
+        stopAll();
+        if(data.text && data.text.trim()) {
+          Speech.speak(data.text,{language:"en-US",pitch:0.85,rate:0.60,volume:0.55});
+        }
+      }
+      else if(data.type==="STOP"){
+        // Stop everything - called when navigating away
+        stopAll();
+      }
+      else if(data.type==="PLAY_ANIMAL"){
+        if(data.audio) playAnimalSound(data.audio, data.text);
+      }
+    } catch(e){
+      console.log("Message handler error:", e.message);
+    }
   };
   return (
     <View style={styles.container}>
@@ -72,7 +101,9 @@ export default function App() {
       <WebView ref={webViewRef} source={{html:HTML}} style={styles.webview}
         javaScriptEnabled={true} originWhitelist={["*"]}
         mediaPlaybackRequiresUserAction={false} allowsInlineMediaPlayback={true}
-        mixedContentMode="always" domStorageEnabled={true} onMessage={handleMessage}/>
+        mixedContentMode="always" domStorageEnabled={true} onMessage={handleMessage}
+        onError={(e) => { stopAll(); }}
+        onNavigationStateChange={() => { stopAll(); }}/>
     </View>
   );
 }
