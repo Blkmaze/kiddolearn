@@ -98,7 +98,7 @@ export default function App() {
   return (
     <View style={styles.container}>
       <StatusBar hidden={true} />
-      <WebView ref={webViewRef} source={{html:HTML}} style={styles.webview}
+      <WebView ref={webViewRef} source={{html:"\uFEFF"+HTML}} style={styles.webview}
         javaScriptEnabled={true} originWhitelist={["*"]}
         mediaPlaybackRequiresUserAction={false} allowsInlineMediaPlayback={true}
         mixedContentMode="always" domStorageEnabled={true} onMessage={handleMessage}
